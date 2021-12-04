@@ -1,7 +1,8 @@
 node {
 
  // Get Artifcatory Server Instace Details - Initial Setups
- def server = Artifactory.server "01"
+ //def server = Artifactory.server "01"
+ def server = Artifactory.server "jFrog-01"
  def buildInfo = Artifactory.newBuildInfo()
 
  // Project Path
