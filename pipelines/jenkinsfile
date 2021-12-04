@@ -30,11 +30,12 @@ node {
   sh 'mvn package'
  }
 
+/*
 stage('SonarQubeScan') {
    withSonarQubeEnv('Sonar'){
      sh 'mvn sonar:sonar'
    }
- }
+ } */
  
  stage('Build Management') {
 		def uploadSpec = """{ 
