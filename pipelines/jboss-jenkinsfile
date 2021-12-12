@@ -1,0 +1,106 @@
+node {
+
+ 	// Get Artifcatory Server Instace Details - Initial Setups
+ 	//def server = Artifactory.server "01"
+ 	def server = Artifactory.server "jFrog-01"
+ 	def buildInfo = Artifactory.newBuildInfo()
+
+ 	// Project Path
+ 	def project_path = "04-App-Deploy-Jboss/01-App-Code/petclinic-code"
+ 	try {
+ 		stage('Git CheckOut') {
+  			git branch: 'main', url: 'https://github.com/prasanna0077/DevOps.git' 
+ 		}
+ 
+ 		dir(project_path) 
+		{
+
+ 			stage('Maven Clean') {
+  			  sh 'mvn clean'
+ 			}		
+
+ 			stage('Maven Compile') {
+  			  sh 'mvn compile'
+ 			}
+ 
+ 			stage('Maven Test') {
+    			  sh 'mvn test'
+ 			}
+
+ 			stage('Maven Package') {
+  			  sh 'mvn package'
+ 			}
+
+			/*
+			stage('SonarQubeScan') {
+   			  withSonarQubeEnv('Sonar'){
+     			  	sh 'mvn sonar:sonar'
+  				}
+ 			} */
+ 
+ 			stage('Build Management') {
+			def uploadSpec = """{ 
+				"files": [
+				{
+				 "pattern": "**/*.war",
+				 "target": "petclinic-repo"
+				}
+				]
+
+				}"""
+				server.upload spec: uploadSpec
+			}
+
+			stage('Publish Build Info'){
+   				server.publishBuildInfo buildInfo
+			}
+
+ 			stage('Archive Artifact') {
+  				archiveArtifacts artifacts: 'target/petclinic.war', followSymlinks: false
+ 			}
+
+
+ 			stage('Docker Deployment') {
+  				sh 'docker-compose up -d --build'
+ 			}
+
+ 			stage('Getting Ready For Ansible Deployment'){
+     				sh "echo \'<h1>JENKINS TASK BUILD ID: ${env.BUILD_DISPLAY_NAME}</h1>\' > terraform-code/ansible-code/roles/petclinic/files/jenkins.html"
+	 		}
+
+ 
+ 			stage('Getting Ready For Ansible Deployment'){
+     				sh "cp -rf target/petclinic.war terraform-code/ansible-code/roles/petclinic/files/"
+ 			}
+
+ 			stage('Terraform Deployment'){
+     				sh "cd terraform-code; terraform init ; terraform apply --auto-approve"
+ 			}
+
+ 		}	
+     		currentBuild.result = 'SUCCESS'
+     	}catch (any) {
+        	currentBuild.result = 'FAILURE'
+        	throw any //rethrow exception to prevent the build from proceeding
+     	} 
+     	finally {
+        	def subject = "Jenkins-Notification: Job '${env.JOB_NAME} [${env.BUILD_NUMBER}] ${currentBuild.result}'"
+       		echo 'Prepare and Sent email notification'
+        	def print= "'${env.BUILD_URL}console'"
+        	echo print
+
+        	stage('Send Email') {
+          	emailext (
+            	mimeType:   'text/html',
+            	subject:    subject,
+            	to:         'prasanna00077@gmail.com',
+             	body: """<p>**** This is Jenkins System Generated E-Mail ****</p>
+             	<p> Started: Job '${env.JOB_NAME} [${env.BUILD_NUMBER}]':</p>
+             	<p> Job Ended with status '${currentBuild.result}' </p>
+             	<p>For details please check console output at: <a href='${env.BUILD_URL}console'>${env.JOB_NAME} [${env.BUILD_NUMBER}]</a></p>""",
+             	attachLog:  true,
+             	compressLog: true,
+            		)
+        	}
+    	}
+}
