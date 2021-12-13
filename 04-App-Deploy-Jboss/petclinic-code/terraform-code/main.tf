@@ -1,5 +1,6 @@
 resource "aws_instance" "frontend" {
   ami                    = var.ami_id
+  count                  = 2
   instance_type          = "t2.micro"
   key_name               = var.key_name
   vpc_security_group_ids = [var.sg_id]
@@ -7,7 +8,7 @@ resource "aws_instance" "frontend" {
     prevent_destroy = false
   }
   tags = {
-    Name = "Dev-Server(jboss)-1"
+    Name = "Dev-Server(jboss)-${count.index+1}"
   }
 
   connection {
@@ -24,7 +25,6 @@ resource "aws_instance" "frontend" {
       "sudo apt-get update -y",
       "sudo apt-get install python sshpass -y"
     ]
-
   }
 }
 
@@ -34,8 +34,15 @@ resource "null_resource" "ansible-main" {
        > jenkins-ci.ini;
        echo "[jenkins-ci]"|tee -a jenkins-ci.ini;
        export ANSIBLE_HOST_KEY_CHECKING=False;
-       echo "${aws_instance.frontend.public_ip}"|tee -a jenkins-ci.ini;
+       echo "${aws_instance.frontend[0].public_ip}"|tee -a jenkins-ci.ini;
        ansible-playbook --key-file=${var.pvt_key_name} -i jenkins-ci.ini -u ubuntu ./ansible-code/jboss.yaml -v 
+  
+       > jenkins-ci-2.ini;
+       echo "[jenkins-ci]"|tee -a jenkins-ci-2.ini;
+       export ANSIBLE_HOST_KEY_CHECKING=False;
+       echo "${aws_instance.frontend[1].public_ip}"|tee -a jenkins-ci-2.ini;
+       ansible-playbook --key-file=${var.pvt_key_name} -i jenkins-ci-2.ini -u ubuntu ./ansible-code/jboss.yaml -v
+  
      EOT
   }
   depends_on = [aws_instance.frontend]
