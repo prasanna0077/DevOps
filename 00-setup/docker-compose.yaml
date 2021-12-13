@@ -1,0 +1,25 @@
+---
+
+nginx: 
+  image: nginx:latest
+  ports:
+    - '8090:81'
+
+tomcat: 
+  image: testtomcat:v1 
+  ports:
+    - '8091:8080'
+
+myapache: 
+  image: testwebserver:v1
+  ports:
+    - '8092:82'
+
+wildfly:
+  build: ./wildfly
+  container_name: "wildfly"
+  ports:
+    - "8080:8081"
+    - "9990:9990"
+  volumes:
+    - "./helloworld/deployments:/opt/jboss/wildfly/standalone/deployments"

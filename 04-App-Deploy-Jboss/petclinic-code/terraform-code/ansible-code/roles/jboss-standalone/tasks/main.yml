@@ -1,0 +1,58 @@
+---
+- name: Set the version of Jboss - wildfly to be Installed.
+  set_fact:
+    jboss_version: 16.0.0.Final
+
+- name: Stop wildfly service
+  service: name=wildfly state=stopped
+   
+- name: Add group "wildfly"
+  command: groupadd -r wildfly
+  ignore_errors: yes
+
+- name: Add user "wildfly"
+  command: useradd -r -g wildfly -d /opt/wildfly -s /sbin/nologin wildfly
+  ignore_errors: yes
+
+- name: Install Default JDK 1.8
+  apt: name=default-jdk state=present
+
+- name: Download WildFly from jboss.org
+  get_url:
+    url: https://download.jboss.org/wildfly/{{jboss_version}}/wildfly-{{jboss_version}}.tar.gz
+    dest: /tmp 
+    force: no
+ 
+- name: Extract wildfly in opt folder
+  command: tar xf /tmp/wildfly-{{jboss_version}}.tar.gz -C /opt/
+ 
+- name: Create a symbolic link to point to the WildFly installation directory
+  command: ln -s /opt/wildfly-{{jboss_version}} /opt/wildfly
+  ignore_errors: yes
+
+- name: Give access to WildFly group and user
+  command: 'chown -RH wildfly: /opt/wildfly'
+ 
+- name: Configure wildfly to be run as a service - create a directory if it doesn't exist
+  file: path=/src/wildfly state=directory mode=0755
+ 
+- name: Copy the wildfly.config file
+  copy: src=/opt/wildfly/docs/contrib/scripts/systemd/wildfly.conf dest=/etc/wildfly/
+
+- name: Copy the launch.sh script from the WildFly package to the /opt/wildfly/bin/ folder
+  copy: src=/opt/wildfly/docs/contrib/scripts/systemd/launch.sh dest=/opt/wildfly/bin/
+
+- name: Make the script executable through the following command
+  command: sh -c 'chmod +x /opt/wildfly/bin/*.sh' 
+
+- name: Copy is the wildfly.service unit file to your system’s services folder /etc/systemd/system
+  copy: src=/opt/wildfly/docs/contrib/scripts/systemd/wildfly.service dest=/etc/systemd/system/
+
+- name: Inform your system that you have added a new unit file by reloading
+  command: systemctl daemon-reload
+
+- name: Start the wildfly service and enable it at the start.
+  service: name=wildfly enabled=yes state=started
+
+- name: Deploy the petclinic code to jboss -wildfly deployments folder
+  copy: src=files/petclinic.war dest=/opt/wildfly/standalone/deployments 

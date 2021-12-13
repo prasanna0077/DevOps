@@ -1,0 +1,8 @@
+--- 
+
+- hosts: localhost
+  name: Petclinic Deployment to JBOSS
+  become: yes
+  roles:
+  - firewall
+  - jboss-standalone

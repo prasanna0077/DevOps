@@ -1,0 +1,91 @@
+---
+- name: Install packages using apt
+  apt:
+    name: 
+        - apt-transport-https
+        - ca-certificates
+        - curl
+        - gnupg2
+        - software-properties-common
+    state: present
+    update_cache: no
+
+- name: Updated apt
+  command: apt -y update
+
+- name: Add Docker GPG apt Key
+  apt_key:
+    url: https://download.docker.com/linux/ubuntu/gpg             
+    state: present
+
+- name: Add Docker Repository
+  apt_repository:
+    repo: deb https://download.docker.com/linux/ubuntu bionic stable
+    state: present
+    update_cache: true
+
+- name: Update apt and install docker-ce
+  apt: update_cache=no name=docker-ce state=present
+
+- name: Run and enable docker
+  service:
+    name: docker
+    state: started
+    enabled: true
+
+- name: Install docker-py
+  command: pip install docker-py
+
+- name: Install Python
+  command: apt install python-pip
+   
+- name: Pull jboss wildfly image
+  command: docker run -it quay.io/wildfly/wildfly
+
+- name: Standalone set the Port
+  command: docker run -p 8080:8080 -p 9990:9990 -it quay.io/wildfly/wildfly /opt/jboss/wildfly/bin/standalone.sh -b 0.0.0.0 -bmanagement 0.0.0.0  
+ 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

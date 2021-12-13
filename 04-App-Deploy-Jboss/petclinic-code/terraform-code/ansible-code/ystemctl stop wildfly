@@ -1,0 +1,10 @@
+[0;1;32m●[0m wildfly.service - The WildFly Application Server
+   Loaded: loaded (/etc/systemd/system/wildfly.service; disabled; vendor preset: enabled)
+   Active: [0;1;32mactive (running)[0m since Sun 2021-12-12 17:34:55 UTC; 2h 19min ago
+ Main PID: 30486 (launch.sh)
+   CGroup: /system.slice/wildfly.service
+           ├─30486 /bin/bash /opt/wildfly/bin/launch.sh standalone standalone.xml 0.0.0.0
+           ├─30488 /bin/sh /opt/wildfly/bin/standalone.sh -c standalone.xml -b 0.0.0.0
+           └─30545 java -D[Standalone] -server -Xms64m -Xmx512m -XX:MetaspaceSize=96M -XX:MaxMetaspaceSize=256m -Djava.net.preferIPv4Stack=true -Djboss.modules.system.pkgs=org.jboss.byteman -Djava.awt.headless=true -Dorg.jboss.boot.log.file=/opt/wildfly/standalone/log/server.log -Dlogging.configuration=file:/opt/wildfly/standalone/configuration/logging.properties -jar /opt/wildfly/jboss-modules.jar -mp /opt/wildfly/modules org.jboss.as.standalone -Djboss.home.dir=/opt/wildfly -Djboss.server.base.dir=/opt/wildfly/standalone -c standalone.xml -b 0.0.0.0
+
+Dec 12 17:34:55 ip-172-31-20-18 systemd[1]: Started The WildFly Application Server.
