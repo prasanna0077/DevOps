@@ -70,7 +70,7 @@ node {
 
  
  			stage('Getting Ready For Ansible Deployment'){
-     				sh "cp -rf target/petclinic.war terraform-code/ansible-code/roles/petclinic/files/"
+     				sh "cp -rf target/petclinic.war /opt/wildfly/standalone/deployments/"
  			}
 
  			stage('Terraform Deployment'){
