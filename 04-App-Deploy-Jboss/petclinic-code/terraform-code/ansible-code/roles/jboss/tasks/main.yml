@@ -5,6 +5,7 @@
 
 - name: Stop wildfly service
   service: name=wildfly state=stopped
+  ignore_errors: yes
    
 - name: Add group "wildfly"
   command: groupadd -r wildfly
