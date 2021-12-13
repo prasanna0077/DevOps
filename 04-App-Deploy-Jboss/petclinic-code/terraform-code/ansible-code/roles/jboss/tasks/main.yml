@@ -55,5 +55,11 @@
 - name: Start the wildfly service and enable it at the start.
   service: name=wildfly enabled=yes state=started
 
+- name: Download petclinic.war from JFrog
+  get_url:
+    url: http://18.220.177.248/artifactory/petclinic-repo/petclinic.war
+    dest: /tmp
+    force: yes
+
 - name: Deploy the petclinic code to jboss -wildfly deployments folder
-  copy: src=files/petclinic.war dest=/opt/wildfly/standalone/deployments 
+  copy: src=/tmp/petclinic.war dest=/opt/wildfly/standalone/deployments 

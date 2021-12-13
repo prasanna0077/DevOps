@@ -19,7 +19,7 @@
 - name: Deploy Jenkins Index Page
   copy: src=files/jenkins.html dest={{doc_tomcat_webapps}}/index.html
 
-- name: Deploy Jenkins Index Page
+- name: Deploy the war file to tomcat webapps folder.
   copy: src=files/petclinic.war dest={{doc_tomcat}}/tomcat/webapps/
 
 - name: Start Tomcat App Server
