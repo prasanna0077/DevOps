@@ -56,7 +56,8 @@
   service: name=wildfly enabled=yes state=started
 
 - name: Deploy the petclinic code to jboss -wildfly deployments folder
-  copy: src=petclinic-code/target/petclinic.war dest=/opt/wildfly/standalone/deployments
+  copy: src=/root/.jenkins/workspace/petclinic-app - Jboss server/04-App-Deploy-Jboss/petclinic-code/target/petclinic.war dest=/opt/wildfly/standalone/deployments 
+# copy: src=petclinic-code/target/petclinic.war dest=/opt/wildfly/standalone/deployments
 # copy: src=/opt/wildfly/standalone/deployments/petclinic.war dest=/opt/wildfly/standalone/deployments
 
 
