@@ -8,7 +8,7 @@ resource "aws_instance" "frontend" {
     prevent_destroy = false
   }
   tags = {
-    Name = "Dev-Server(jboss)-${count.index+1}"
+    Name = "QA-Server(jboss)-${count.index+1}"
   }
 
   connection {
