@@ -6,7 +6,7 @@ node {
  	def buildInfo = Artifactory.newBuildInfo()
 
  	// Project Path
- 	def project_path = "04-App-Deploy-Jboss/01-App-Code/petclinic-code"
+ 	def project_path = "04-App-Deploy-Jboss/petclinic-code"
  	try {
  		stage('Git CheckOut') {
   			git branch: 'main', url: 'https://github.com/prasanna0077/DevOps.git' 
