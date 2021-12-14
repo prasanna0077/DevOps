@@ -1,0 +1,43 @@
+node {
+
+ 	// Project Path
+ 	def project_path = "01-App-Code/petclinic-code"
+ 	try {
+
+		stage('Git CheckOut') {
+                        git branch: 'main', url: 'https://github.com/prasanna0077/DevOps.git'
+                }
+
+ 		dir(project_path) 
+		{
+ 			stage('Terraform Stop Instance'){
+     				sh "cd terraform-code; terraform init; terraform destroy --auto-approve"
+ 			}
+
+ 		}	
+     		currentBuild.result = 'SUCCESS'
+     	}catch (any) {
+        	currentBuild.result = 'FAILURE'
+        	throw any //rethrow exception to prevent the build from proceeding
+     	} 
+     	finally {
+        	def subject = "Jenkins-Notification: Job '${env.JOB_NAME} [${env.BUILD_NUMBER}] ${currentBuild.result}'"
+       		echo 'Prepare and Sent email notification'
+        	def print= "'${env.BUILD_URL}console'"
+        	echo print
+
+        	stage('Send Email') {
+          	emailext (
+            	mimeType:   'text/html',
+            	subject:    subject,
+            	to:         'prasanna00077@gmail.com',
+             	body: """<p>**** This is Jenkins System Generated E-Mail ****</p>
+             	<p> Started: Job '${env.JOB_NAME} [${env.BUILD_NUMBER}]':</p>
+             	<p> Job Ended with status '${currentBuild.result}' </p>
+             	<p>For details please check console output at: <a href='${env.BUILD_URL}console'>${env.JOB_NAME} [${env.BUILD_NUMBER}]</a></p>""",
+             	attachLog:  true,
+             	compressLog: true,
+            		)
+        	}
+    	}
+}
