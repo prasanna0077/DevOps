@@ -11,7 +11,7 @@ node {
  		dir(project_path) 
 		{
  			stage('Terraform Stop Instance'){
-     				sh "cd terraform-code; terraform destroy --auto-approve"
+     				sh "cd terraform-code; terraform init; terraform destroy --auto-approve"
  			}
 
  		}	
